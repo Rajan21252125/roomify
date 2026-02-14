@@ -86,6 +86,7 @@ const Upload = ({ onComplete }: UploadProps) => {
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("inside the input file")
     if (!isSignedIn) return;
 
     const selectedFile = e.target.files?.[0];
