@@ -14,25 +14,43 @@ const Upload = ({ onComplete }: UploadProps) => {
 
   const { isSignedIn } = useOutletContext<AuthContext>();
 
+  const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  React.useEffect(() => {
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    }
+  }, []);
+
   const processFile = (file: File) => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
     const reader = new FileReader();
+    reader.onerror = (e) => {
+      console.log("Error reading file", e);
+      setProgress(0);
+      setFile(null);
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
 
     reader.onload = (e) => {
       const base64 = e.target?.result as string;
       let currentProgress = 0;
 
-      const interval = setInterval(() => {
+      intervalRef.current = setInterval(() => {
         currentProgress += PROGRESS_INCREMENT;
 
         if (currentProgress >= 100) {
           currentProgress = 100;
-          clearInterval(interval);
+          if (intervalRef.current) clearInterval(intervalRef.current);
           setProgress(100);
 
-          setTimeout(() => {
-            if (onComplete) {
-              onComplete(base64);
-            }
+          timeoutRef.current = setTimeout(() => {
+            onComplete?.(base64);
           }, REDIRECT_DELAY_MS);
         } else {
           setProgress(currentProgress);
@@ -61,7 +79,8 @@ const Upload = ({ onComplete }: UploadProps) => {
     if (!isSignedIn) return;
 
     const droppedFile = e.dataTransfer.files?.[0];
-    if (droppedFile) {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+    if (droppedFile && allowedTypes.includes(droppedFile.type)) {
       processFile(droppedFile);
     }
   };
