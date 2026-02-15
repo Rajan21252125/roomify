@@ -45,6 +45,7 @@ export default function Home() {
         name
       }
     });
+    console.log(projects);
     return true;
   }
   return (
