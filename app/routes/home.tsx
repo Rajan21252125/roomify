@@ -4,7 +4,7 @@ import { ArrowRight, ArrowUpRight, Clock, Layers } from "lucide-react";
 import Button from "components/ui/Button";
 import Upload from "components/Upload";
 import { useNavigate } from "react-router";
-import { createPorject } from "lib/puter.action";
+import { createProject } from "lib/puter.action";
 import { useState } from "react";
 
 export function meta({ }: Route.MetaArgs) {
@@ -30,7 +30,7 @@ export default function Home() {
       timestamp: Date.now(),
     }
 
-    const saved = await createPorject({ item: newItem, visibility: "private" });
+    const saved = await createProject({ item: newItem, visibility: "private" });
 
     if (!saved) {
       console.error(`Failed to create project ${newId}`);
@@ -92,9 +92,9 @@ export default function Home() {
           </div>
           <div className="projects-grid">
             {projects.map(({ id, name, sourceImage, renderedImage, timestamp }) => (
-              <div className="project-card group">
+              <div className="project-card group" key={id}>
                 <div className="preview">
-                  <img src={renderedImage || sourceImage} alt="Porject" />
+                  <img src={renderedImage || sourceImage} alt="Project" />
                   <div className="badge">
                     <span>Community</span>
                   </div>

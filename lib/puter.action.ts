@@ -15,7 +15,7 @@ export const getCurrentUser = async () => {
     }
 }
 
-export const createPorject = async ({ item }: CreateProjectParams): Promise<DesignItem | null | undefined> => {
+export const createProject = async ({ item }: CreateProjectParams): Promise<DesignItem | null | undefined> => {
     const projectId = item.id;
 
     const hosting = await getOrCreateHostingConfig();
@@ -24,8 +24,8 @@ export const createPorject = async ({ item }: CreateProjectParams): Promise<Desi
 
     const hostedRendered = projectId && item.renderedImage ? await uploadImageToHosting({ hosting, url: item.renderedImage, projectId, label: "rendered" }) : null;
 
-    const resolvedSource = hostedSource?.url || (isHostedUrl(item.sourceImage)) ? item.sourceImage : '';
-    const resolvedRendered = hostedRendered?.url ? hostedRendered.url : item.renderedImage && isHostedUrl(item.renderedImage) ? item.renderedImage : '';
+    const resolvedSource = hostedSource?.url || (isHostedUrl(item.sourceImage) ? item.sourceImage : '');
+    const resolvedRendered = hostedRendered?.url || (item.renderedImage && isHostedUrl(item.renderedImage) ? item.renderedImage : '');
 
     if (!resolvedSource) {
         console.warn(`failed to store source image for project ${projectId}, skipping save`)
